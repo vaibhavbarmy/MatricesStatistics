@@ -1,4 +1,4 @@
-package keryszig
+package kreyszig
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,5 +11,7 @@ package keryszig
  * To change this template use File | Settings | File Templates.
  */
 object GuassElimination {
-
+  def main(args: Array[String])={
+    println("String")
+  }
 }
