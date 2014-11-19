@@ -40,6 +40,7 @@ object MeanVarianceQuartile {
   }
 
   def main(args: Array[String]){
+
     val dataSet: List[Double] = List(2.0,4.0,8.0)
     println(generalizedMethod((x, y) => x + y)( x => x/dataSet.size)( dataSet, 0.0))
     println(generalizedMethod((x,y) => x*y )( x => cubeRootAvgDamp(x))( dataSet, 1.0))
@@ -51,5 +52,16 @@ object MeanVarianceQuartile {
     println(geometricMean(dataSet))
     println(harmonicMean(dataSet))
     println(variance(dataSet))
+
+    val num = 2.0
+    val power = .8
+    import scala.math.pow
+    var currentTime = System.currentTimeMillis()
+    println(positivePowerOperator(num, power))
+    println(System.currentTimeMillis() - currentTime)
+
+    currentTime = System.currentTimeMillis()
+    println(pow(num, power))
+    println(System.currentTimeMillis() - currentTime)
   }
 }

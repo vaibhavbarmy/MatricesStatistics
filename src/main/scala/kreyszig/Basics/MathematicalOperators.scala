@@ -80,4 +80,33 @@ object MathematicalOperators {
     else positivePowerOperator(x, power)
   }
 
+  /**
+   * Method to calculate gcd
+   * @param x The first parameter for gcd
+   * @param y The decond parameter for gcd
+   * @return The gcd for the inputs
+   */
+  def gcd(x: Int , y: Int): Int = if (y == 0) x else gcd(y, x % y)
+
+  /**A very basic and incorrect method for a double type power operator
+   *
+   * @param x     value whose power to be computed
+   * @param power positive value of power
+   * @return
+   */
+  def positivePowerOperator(x: Double, power: Double): Double = {
+    def getWholeAndFractionDouble(x: Double): (Int, Int) = {
+      val exponent = x.toInt
+      val mantissa = (x - exponent).toFloat
+      (exponent, Integer.valueOf(mantissa.toString.split("\\.")(1)))
+    }
+    val (whole, frac) = getWholeAndFractionDouble(power)
+    val multiplier = positivePowerOperator(10,frac.toString.size).toInt
+
+    val wholeNumer = (power * multiplier).toInt
+    val gcdValue = gcd(wholeNumer, multiplier)
+
+    posAndNegPowerOperator(posAndNegPowerOperator(x, wholeNumer/gcdValue), -1*multiplier/gcdValue)
+  }
+
 }
