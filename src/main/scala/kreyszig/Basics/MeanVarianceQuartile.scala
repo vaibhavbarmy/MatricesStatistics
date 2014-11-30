@@ -8,6 +8,7 @@ package kreyszig.Basics
  * To change this template use File | Settings | File Templates.
  */
 import MathematicalOperators._
+import BaseAlgorithms._
 
 object MeanVarianceQuartile {
 
@@ -39,6 +40,31 @@ object MeanVarianceQuartile {
     generalizedMethod((x,y) => x + posAndNegPowerOperator((y - mean) , 2)) ( x => x/(dataSet.size)) (dataSet, 0.0)
   }
 
+  /**
+   *
+   * @param dataSet
+   * @tparam N
+   * @return
+   */
+  def quartile[N](sortFunc: Array[N] => Array[N])(additionFunc: (Double,Double) => Double, divideFunc: (Double,Double) => Double)(dataSetWhole: Array[N]):(N,N,N) = {
+    val sortedDataSet:Array[N] = sortFunc(dataSetWhole)
+    def medianCalc(dataSet: Array[N]):N={
+      if(dataSet.length%2 == 0) divideFunc(additionFunc(parse[Double](dataSet(dataSet.length/2).toString).getOrElse(0.0),parse[Double](dataSet(dataSet.length/2 - 1).toString).getOrElse(0.0)),2.0).asInstanceOf[N]
+      else  dataSet((dataSet.length/2) )
+    }
+    val median = medianCalc(dataSetWhole)
+    val (lowerQuartile, upperQuartile):(N,N) = if (dataSetWhole.length%2 != 0) {
+      val (belowMedian, aboveMedian) = sortedDataSet.splitAt(sortedDataSet.length/2)
+      val trueAboveMedian = aboveMedian.splitAt(1)._2
+      (medianCalc(belowMedian), medianCalc(trueAboveMedian))
+    }
+    else {
+      val (belowMedian, aboveMedian) = sortedDataSet.splitAt(sortedDataSet.length/2)
+      (medianCalc(belowMedian), medianCalc(aboveMedian))
+    }
+    (median,lowerQuartile,upperQuartile)
+  }
+
   def main(args: Array[String]){
 
     val dataSet: List[Double] = List(2.0,4.0,8.0)
@@ -57,11 +83,14 @@ object MeanVarianceQuartile {
     val power = .8
     import scala.math.pow
     var currentTime = System.currentTimeMillis()
-    println(positivePowerOperator(num, power))
+    //println(positivePowerOperator(num, power))
     println(System.currentTimeMillis() - currentTime)
 
     currentTime = System.currentTimeMillis()
     println(pow(num, power))
     println(System.currentTimeMillis() - currentTime)
+    val x = List(3,7,8,5,2,1,9,5,4,3)
+    println(quickSort((x,y) => (x+y)/2 )((x:Int,y:Int) => x < y)(x.toArray).toList)
+    println("test", quartile(quickSort((x,y) => (x+y)/2 )((x:Int,y:Int) => x < y) _)((x:Double,y:Double) => (x+y), (x:Double,y: Double) => x/y)(x.toArray))
   }
 }

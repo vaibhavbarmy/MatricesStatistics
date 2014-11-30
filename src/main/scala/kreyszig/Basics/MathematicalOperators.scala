@@ -108,5 +108,10 @@ object MathematicalOperators {
 
     posAndNegPowerOperator(posAndNegPowerOperator(x, wholeNumer/gcdValue), -1*multiplier/gcdValue)
   }
+  case class ParseOp[T](op: String => T)
+  implicit val popDouble = ParseOp[Double](_.toDouble)
+  implicit val popInt = ParseOp[Int](_.toInt)
+  def parse[T: ParseOp](s: String) = try { Some(implicitly[ParseOp[T]].op(s)) }
+  catch {case _ => None}
 
 }
