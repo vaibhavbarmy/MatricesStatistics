@@ -13,7 +13,7 @@ import BaseAlgorithms._
 object MeanVarianceQuartile {
 
   /**
-   * Method to compute a opration with the schema ( SomeOperator on (sigma or pie or anything on ( dataset and its derived parameter) ))
+   * Method to compute a operation with the schema ( SomeOperator on (sigma or pie or anything on ( dataset and its derived parameter) ))
    *
    * @param constituentOperator
    * @param resultOperator
@@ -41,8 +41,12 @@ object MeanVarianceQuartile {
   }
 
   /**
+   * Method to compute median, upper and lower quartile values for a Array of data points having type Numeric
    *
-   * @param dataSet
+   * @param sortFunc      sort function for a array
+   * @param additionFunc  addition function between two numeric data points
+   * @param divideFunc    divide function between two numeric data points
+   * @param dataSetWhole  Array of data points
    * @tparam N
    * @return
    */

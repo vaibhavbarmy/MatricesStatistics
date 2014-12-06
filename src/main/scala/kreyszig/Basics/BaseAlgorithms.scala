@@ -28,8 +28,9 @@ object BaseAlgorithms {
   }
 
   /**
-   * Method to merge and sort a list in descending order
+   * Method to merge sort a input list taking merge function as a parameter
    *
+   * @param mergeFunc
    * @param inputList
    * @return
    */
@@ -46,6 +47,15 @@ object BaseAlgorithms {
     }
   }
 
+  /**
+   * Method to quick sort a Numeric array
+   *
+   * @param pivotFunc       Function to assume a pivot point
+   * @param comparatorFunc  Funcations to compare two numeric points
+   * @param array
+   * @tparam N
+   * @return
+   */
   def quickSort[N](pivotFunc: (Int,Int) => Int)(comparatorFunc: (N,N) => Boolean)(array: Array[N]): Array[N] = {
     var tmpArray = array
     def sort[N](left: Int, right: Int){
@@ -78,10 +88,65 @@ object BaseAlgorithms {
     tmpArray
   }
 
+  /**
+   * Method to calculate median for a numeric array
+   *
+   * @param sortFunc
+   * @param additionFunc
+   * @param divideFunc
+   * @param dataSet
+   * @tparam N
+   * @return
+   */
   def medianCalc[N](sortFunc: Array[N] => Array[N])(additionFunc: (Double,Double) => Double, divideFunc: (Double,Double) => Double)(dataSet: Array[N]):N={
     val sortedDataSet = sortFunc(dataSet)
     if(sortedDataSet.length%2 == 0) divideFunc(additionFunc(parse[Double](sortedDataSet(sortedDataSet.length/2).toString).getOrElse(0.0),parse[Double](sortedDataSet(sortedDataSet.length/2 - 1).toString).getOrElse(0.0)),2.0).asInstanceOf[N]
     else  sortedDataSet((sortedDataSet.length/2))
+  }
+
+  /**
+   * Method to get the union of seq of event Sets
+   *
+   * @param eventsSet seq of event sets
+   * @tparam T        Type of event values
+   * @return
+   */
+  def union[T](eventsSet: Set[T]*): Set[T] = {
+    def iter[T](accSet: Set[T], remainderEventsSet: Seq[Set[T]]): Set[T] = {
+      if(remainderEventsSet.isEmpty) accSet
+      else iter[T](accSet.union(remainderEventsSet.head), remainderEventsSet.tail)
+    }
+    val seqOfEvents: Seq[Set[T]] = eventsSet.toSeq
+    iter[T](Set[T](), seqOfEvents)
+  }
+
+  /**
+   * Method to get intersection of seq of event sets
+   *
+   * @param eventsSet seq of event sets
+   * @tparam T        type of event values
+   * @return
+   */
+  def intersection[T](eventsSet: Set[T]*): Set[T] = {
+    def iter[T](accSet: Set[T], remainderEventsSet: Seq[Set[T]]): Set[T] = {
+      if(remainderEventsSet.isEmpty) accSet
+      else if(accSet.isEmpty) iter[T](remainderEventsSet.head, remainderEventsSet.tail)
+      else iter[T](accSet.intersect(remainderEventsSet.head), remainderEventsSet.tail)
+    }
+    val seqOfEvents: Seq[Set[T]] = eventsSet.toSeq
+    iter[T](Set[T](), seqOfEvents)
+  }
+
+  /**
+   * Method to get compliment of a event set corresponding to sample space
+   *
+   * @param sampleSpace sample space for all the events
+   * @param eventSet    event set whose compliment is to get
+   * @tparam T          Type of event value
+   * @return
+   */
+  def compliment[T](sampleSpace: Set[T], eventSet: Set[T]): Set[T] = {
+    sampleSpace.diff(eventSet)
   }
 
   def main(args: Array[String]){
@@ -93,8 +158,9 @@ object BaseAlgorithms {
     //println(y(1))
     val y = x.toArray
     //println(y(1))
+    val a = List(100,200,500,5)
     val z = List(5, 5, 7, 8, 9,3)
-
+    println(compliment(a.toSet,intersection[Int](z.toSet ,y.toSet, a.toSet)).toList)
     println(quickSort((x,y) => (x+y)/2 )((x: Int,y: Int) => x < y)(x.toArray).toList)
     println(quickSort((x,y) => (x+y)/2 )((x: Int,y: Int) => x < y)(z.toArray).toList)
     println(medianCalc(quickSort((x,y) => (x+y)/2 )((x:Int,y:Int) => x < y) _)((x:Double,y:Double) => (x+y), (x:Double,y: Double) => x/y)(z.toArray))
