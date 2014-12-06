@@ -107,46 +107,52 @@ object BaseAlgorithms {
   /**
    * Method to get the union of seq of event Sets
    *
-   * @param eventsSet seq of event sets
+   * @param eventsList seq of event sets
    * @tparam T        Type of event values
    * @return
    */
-  def union[T](eventsSet: Set[T]*): Set[T] = {
-    def iter[T](accSet: Set[T], remainderEventsSet: Seq[Set[T]]): Set[T] = {
-      if(remainderEventsSet.isEmpty) accSet
-      else iter[T](accSet.union(remainderEventsSet.head), remainderEventsSet.tail)
+  def union[T](eventsList: List[T]*): List[T] = {
+    def iter[T](accList: List[T], remainderEventsList: Seq[List[T]]): List[T] = {
+      if(remainderEventsList.isEmpty) accList
+      else {
+        val head:List[T] = remainderEventsList.head
+        val tail:Seq[List[T]] = remainderEventsList.tail
+        val union: List[T] = accList.union(head)
+        val intersection: List[T] = accList.intersect(head)
+        val properUnion = union.diff(intersection)
+        iter[T](properUnion, tail)}
     }
-    val seqOfEvents: Seq[Set[T]] = eventsSet.toSeq
-    iter[T](Set[T](), seqOfEvents)
+    val seqOfEvents: Seq[List[T]] = eventsList.toSeq
+    iter[T](List[T](), seqOfEvents)
   }
 
   /**
-   * Method to get intersection of seq of event sets
+   * Method to get intersection of seq of event Lists
    *
-   * @param eventsSet seq of event sets
+   * @param eventsList seq of event Lists
    * @tparam T        type of event values
    * @return
    */
-  def intersection[T](eventsSet: Set[T]*): Set[T] = {
-    def iter[T](accSet: Set[T], remainderEventsSet: Seq[Set[T]]): Set[T] = {
-      if(remainderEventsSet.isEmpty) accSet
-      else if(accSet.isEmpty) iter[T](remainderEventsSet.head, remainderEventsSet.tail)
-      else iter[T](accSet.intersect(remainderEventsSet.head), remainderEventsSet.tail)
+  def intersection[T](eventsList: List[T]*): List[T] = {
+    def iter[T](accList: List[T], remainderEventsList: Seq[List[T]]): List[T] = {
+      if(remainderEventsList.isEmpty) accList
+      else if(accList.isEmpty) iter[T](remainderEventsList.head, remainderEventsList.tail)
+      else iter[T](accList.intersect(remainderEventsList.head), remainderEventsList.tail)
     }
-    val seqOfEvents: Seq[Set[T]] = eventsSet.toSeq
-    iter[T](Set[T](), seqOfEvents)
+    val seqOfEvents: Seq[List[T]] = eventsList.toSeq
+    iter[T](List[T](), seqOfEvents)
   }
 
   /**
-   * Method to get compliment of a event set corresponding to sample space
+   * Method to get compliment of a event List corresponding to sample space
    *
    * @param sampleSpace sample space for all the events
-   * @param eventSet    event set whose compliment is to get
+   * @param eventList    event List whose compliment is to get
    * @tparam T          Type of event value
    * @return
    */
-  def compliment[T](sampleSpace: Set[T], eventSet: Set[T]): Set[T] = {
-    sampleSpace.diff(eventSet)
+  def compliment[T](sampleSpace: List[T], eventList: List[T]): List[T] = {
+    sampleSpace.diff(eventList)
   }
 
   def main(args: Array[String]){
@@ -158,9 +164,10 @@ object BaseAlgorithms {
     //println(y(1))
     val y = x.toArray
     //println(y(1))
-    val a = List(100,200,500,5)
+    val a = List(100,200,500,5,5)
     val z = List(5, 5, 7, 8, 9,3)
-    println(compliment(a.toSet,intersection[Int](z.toSet ,y.toSet, a.toSet)).toList)
+    println(z.toSet.toList)
+    println("union", union[Int](z ,y.toList, a))
     println(quickSort((x,y) => (x+y)/2 )((x: Int,y: Int) => x < y)(x.toArray).toList)
     println(quickSort((x,y) => (x+y)/2 )((x: Int,y: Int) => x < y)(z.toArray).toList)
     println(medianCalc(quickSort((x,y) => (x+y)/2 )((x:Int,y:Int) => x < y) _)((x:Double,y:Double) => (x+y), (x:Double,y: Double) => x/y)(z.toArray))
