@@ -149,5 +149,6 @@ object ProbabilityAndConditionalProbability {
 
     println(union(List(a,b), List(c,d)))
     println(conditionalProbability(List(a,b), List(c,d)))
+
   }
 }
