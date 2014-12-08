@@ -115,6 +115,21 @@ object ProbabilityAndConditionalProbability {
     probability
   }
 
+  /**
+   * Method to get conditional probability of even B under the condition that A occurred (A and B are mutually inclusive)
+   *
+   * @param B   event B
+   * @param A   event A
+   * @tparam T
+   * @return
+   */
+  def conditionalProbability[T](B: List[eventOutcomeProbability[T]], A: List[eventOutcomeProbability[T]]): Double = {
+    val probabilityAintersectBList: List[eventOutcomeProbability[T]] = intersection(B,A)
+    val probAIntersectB:Double = probabilityAintersectBList.aggregate(0.0)(_ + _.probability.getOrElse(0.0), _ + _)
+    val probA:Double = B.aggregate(0.0)(_ + _.probability.getOrElse(0.0), _ + _)
+    probAIntersectB/probA
+  }
+
   def main(args: Array[String]){
     var eopdfs: List[eventOutcomeProbabilityDensityFunctions[Int]] = List[eventOutcomeProbabilityDensityFunctions[Int]]()
     var sopdfs: List[eventOutcomeProbability[Int]] = List[eventOutcomeProbability[Int]]()
@@ -127,11 +142,12 @@ object ProbabilityAndConditionalProbability {
     sopdfs = sopdfs :+ eventOutcomeProbability(1, Some(1*3), Some(1.0/20.0))
     //println(distinct[Int]((x,y) => x+y, sopdfs))
     //println((x :+ 4).length)
-    val a: eventOutcomeProbability[Int] = eventOutcomeProbability(1,Some(2),Some(.5))
-    val b: eventOutcomeProbability[Int] = eventOutcomeProbability(1,Some(2),Some(.4))
-    val c: eventOutcomeProbability[Int] = eventOutcomeProbability(1,Some(2),Some(.4))
-    val d: eventOutcomeProbability[Int] = eventOutcomeProbability(1,Some(2),Some(.6))
+    val a: eventOutcomeProbability[Int] = eventOutcomeProbability(1,Some(2),Some(.2))
+    val b: eventOutcomeProbability[Int] = eventOutcomeProbability(2,Some(4),Some(.5))
+    val c: eventOutcomeProbability[Int] = eventOutcomeProbability(2,Some(4),Some(.5))
+    val d: eventOutcomeProbability[Int] = eventOutcomeProbability(3,Some(6),Some(.3))
 
     println(union(List(a,b), List(c,d)))
+    println(conditionalProbability(List(a,b), List(c,d)))
   }
 }
