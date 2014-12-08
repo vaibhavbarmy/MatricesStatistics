@@ -1,5 +1,5 @@
 package kreyszig.Basics
-
+import scala.math._
 /**
  * Created with IntelliJ IDEA.
  * User: vaibh_000
@@ -8,7 +8,11 @@ package kreyszig.Basics
  * To change this template use File | Settings | File Templates.
  */
 object MathematicalOperators {
-
+  case class ParseOp[T](op: String => T)
+  implicit val popDouble = ParseOp[Double](_.toDouble)
+  implicit val popInt = ParseOp[Int](_.toInt)
+  def parse[T: ParseOp](s: String) = try { Some(implicitly[ParseOp[T]].op(s)) }
+  catch {case _ => None}
   val tolerance = 0.0001
 
   /**
@@ -108,10 +112,46 @@ object MathematicalOperators {
 
     posAndNegPowerOperator(posAndNegPowerOperator(x, wholeNumer/gcdValue), -1*multiplier/gcdValue)
   }
-  case class ParseOp[T](op: String => T)
-  implicit val popDouble = ParseOp[Double](_.toDouble)
-  implicit val popInt = ParseOp[Int](_.toInt)
-  def parse[T: ParseOp](s: String) = try { Some(implicitly[ParseOp[T]].op(s)) }
-  catch {case _ => None}
 
+  /**
+   * Method to calculate factorial of small as well as large numbers using stirling's formula
+   *
+   * @param n
+   * @return
+   */
+  def factorial(n: Int) = {
+    def iter(current: Int, acc: Int): Int = {
+      if(current == 0) acc else iter(current - 1, acc*current)
+    }
+    if (n<32) iter(n, 1)
+    else (pow(2*Pi*n, 2)*pow(n/E, n)).toInt
+  }
+
+  /**
+   * Method to calculate binomial coefficient for (a b)
+   *
+   * @param a
+   * @param k
+   * @return
+   */
+  def binomialCoefficient(a:Int, k:Int): Int = {
+    if(a==k) 1
+    else{
+      (a,k) match {
+        case (x,0) => 1
+        case (0,0) => 1
+        case (0,y) => 0
+        case (n,k) => binomialCoefficient(n-1,k-1) + binomialCoefficient(n-1,k)
+      }
+    }
+  }
+
+  def main(args: Array[String]){
+    println(factorial(32))
+    //println(4.5.toInt)
+    val time = System.currentTimeMillis()
+    println(binomialCoefficient(8,8))
+    println(System.currentTimeMillis() - time)
+
+  }
 }
