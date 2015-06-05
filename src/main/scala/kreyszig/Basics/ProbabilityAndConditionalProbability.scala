@@ -33,6 +33,15 @@ object ProbabilityAndConditionalProbability {
   case class eventOutcomeProbability[T](event: T, outcome: Option[T], probability: Option[Double]) extends Probability
 
   /**
+   * case class having probability and outcome information specific to a data point
+   *
+   * @param event       value of the data point or event
+   * @param outcome     outcome value at that data point
+   * @param pdf         probability at that data point
+   * @tparam T
+   */
+  case class eventOutcomeProbabilityDensityFunction[T](event: T, outcome: Option[T], pdf: T=> Double) extends Probability
+  /**
    * method to get distinct list of eventOutcomeProbability class based on distinct event points
    *
    * @param outcomeAdditionFunc           outcome addition function required in case of a data point occuring more than twice
@@ -74,13 +83,32 @@ object ProbabilityAndConditionalProbability {
    * @tparam T
    * @return
    */
-  def probabilityCalculator[T](eventOutcomePdfs: List[eventOutcomeProbabilityDensityFunctions[T]]): List[eventOutcomeProbability[T]] ={
+  def probabilityCalculators[T](eventOutcomePdfs: List[eventOutcomeProbabilityDensityFunctions[T]]): List[eventOutcomeProbability[T]] ={
     def iter(acc: List[eventOutcomeProbability[T]], currentEventOutcomePdfs: List[eventOutcomeProbabilityDensityFunctions[T]]) : List[eventOutcomeProbability[T]] = {
       if (currentEventOutcomePdfs.isEmpty) acc
       else {
         val head: eventOutcomeProbabilityDensityFunctions[T] = currentEventOutcomePdfs.head
         val tail: List[eventOutcomeProbabilityDensityFunctions[T]] = currentEventOutcomePdfs.tail
         iter(acc :+ eventOutcomeProbability(head.event, Some(head.outcome(head.event)), Some(head.pdf(head.event))), tail)
+      }
+    }
+    iter(List[eventOutcomeProbability[T]](), eventOutcomePdfs)
+  }
+
+  /**
+   * method to calculate individual outcome and probability value based on the input outcome and pdf function present in case class eventOutcomeProbabilityDensityFunctions[T]
+   *
+   * @param eventOutcomePdfs list of all event outcome functions and pdfs
+   * @tparam T
+   * @return
+   */
+  def probabilityCalculator[T](eventOutcomePdfs: List[eventOutcomeProbabilityDensityFunction[T]]): List[eventOutcomeProbability[T]] ={
+    def iter(acc: List[eventOutcomeProbability[T]], currentEventOutcomePdfs: List[eventOutcomeProbabilityDensityFunction[T]]) : List[eventOutcomeProbability[T]] = {
+      if (currentEventOutcomePdfs.isEmpty) acc
+      else {
+        val head: eventOutcomeProbabilityDensityFunction[T] = currentEventOutcomePdfs.head
+        val tail: List[eventOutcomeProbabilityDensityFunction[T]] = currentEventOutcomePdfs.tail
+        iter(acc :+ eventOutcomeProbability(head.event, head.outcome, Some(head.pdf(head.outcome.get))), tail)
       }
     }
     iter(List[eventOutcomeProbability[T]](), eventOutcomePdfs)
@@ -96,10 +124,10 @@ object ProbabilityAndConditionalProbability {
    */
   def normalizedProbabilityCalculator[T](eventOutcomePdfs: List[eventOutcomeProbabilityDensityFunctions[T]], sampleSpaceOutcomePdfs: List[eventOutcomeProbabilityDensityFunctions[T]]): List[eventOutcomeProbability[T]] ={
     var sampleProbability: Double = 0.0
-    probabilityCalculator(sampleSpaceOutcomePdfs).foreach(f => {
+    probabilityCalculators(sampleSpaceOutcomePdfs).foreach(f => {
       if (f.probability.getOrElse(0.0) > 0) {sampleProbability += f.probability.getOrElse(0.0)} else sampleProbability
     })
-    probabilityCalculator(eventOutcomePdfs).map(f => new eventOutcomeProbability(f.event, f.outcome, Option(f.probability.getOrElse(0.0)/sampleProbability)))
+    probabilityCalculators(eventOutcomePdfs).map(f => new eventOutcomeProbability(f.event, f.outcome, Option(f.probability.getOrElse(0.0)/sampleProbability)))
   }
 
   /**
@@ -126,7 +154,7 @@ object ProbabilityAndConditionalProbability {
   def conditionalProbability[T](B: List[eventOutcomeProbability[T]], A: List[eventOutcomeProbability[T]]): Double = {
     val probabilityAintersectBList: List[eventOutcomeProbability[T]] = intersection(B,A)
     val probAIntersectB:Double = probabilityAintersectBList.aggregate(0.0)(_ + _.probability.getOrElse(0.0), _ + _)
-    val probA:Double = B.aggregate(0.0)(_ + _.probability.getOrElse(0.0), _ + _)
+    val probA:Double = A.aggregate(0.0)(_ + _.probability.getOrElse(0.0), _ + _)
     probAIntersectB/probA
   }
 
@@ -137,7 +165,7 @@ object ProbabilityAndConditionalProbability {
     val count = normalizedProbabilityValueCalculator[Int](sopdfs)
     println(count)
     for (x <- 0 until 5) eopdfs = eopdfs :+ eventOutcomeProbabilityDensityFunctions[Int](x, x => x*2, x => 1/20.0)
-    println(normalizedProbabilityValueCalculator[Int](probabilityCalculator[Int](eopdfs)))
+    println(normalizedProbabilityValueCalculator[Int](probabilityCalculators[Int](eopdfs)))
     val x = Array(1,2,3)
     sopdfs = sopdfs :+ eventOutcomeProbability(1, Some(1*3), Some(1.0/20.0))
     //println(distinct[Int]((x,y) => x+y, sopdfs))

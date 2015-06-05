@@ -147,10 +147,10 @@ object MathematicalOperators {
   }
 
   def main(args: Array[String]){
-    println(factorial(32))
+    //println(factorial(32))
     //println(4.5.toInt)
     val time = System.currentTimeMillis()
-    println(binomialCoefficient(8,8))
+    println(binomialCoefficient(5,2))
     println(System.currentTimeMillis() - time)
 
   }
